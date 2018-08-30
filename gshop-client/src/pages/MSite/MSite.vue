@@ -94,20 +94,21 @@
     },
 
     // 注意: 状态变化后, 界面才异步执行更新, watch的回调是同步执行
-    watch: {//update也有更新的作用，但是更新的是所有的，watch可以只监视这一个的更新
+    watch: {
       categorys () { // 获得了categorys列表数据了
 
         // 将回调延迟到下次 DOM 更新循环之后执行。在修改数据之后立即使用它
         this.$nextTick(() => {
           // 必须在列表界面显示后才创建(列表数据显示后)
-            new Swiper('.swiper-container', {
-              loop: true,  // 循环轮播
-              // 如果需要分页器
-              pagination: {
-                el: '.swiper-pagination',
-              },
+          new Swiper('.swiper-container', {
+            loop: true,  // 循环轮播
+            // 如果需要分页器
+            pagination: {
+              el: '.swiper-pagination',
+            },
           })
         })
+
       }
     },
 

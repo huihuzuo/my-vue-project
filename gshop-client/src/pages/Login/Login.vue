@@ -41,9 +41,9 @@
                 </div>
               </section>
               <section class="login_message">
-                <input type="text" maxlength="11" placeholder="验证码">
+                <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
                 <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha"
-                     @click="updateCaptcha">
+                     @click="updateCaptcha" ref="captcha">
               </section>
             </section>
           </div>
@@ -103,17 +103,18 @@
         }
       },
       //更新显示一次性图形验证码
-      updateCaptcha(event){//每次请求都不一样，浏览器就会自动发请求获取新的图片
-        event.target.src='http://localhost:4000/captcha?time=' + Date.now()
+      updateCaptcha(){//每次请求都不一样，浏览器就会自动发请求获取新的图片
+        this.$refs.captcha.src='http://localhost:4000/captcha?time=' + Date.now()
       },
       //请求登录
 
       showAlert(msg){
         MessageBox.alert(msg)
       },
-      login(){
+      async login(){
         //前台表单验证
         const {phone,code,name,pwd,captcha}=this;
+        let result;
         if(this.loginWay){//密码登录
             if(!name){
               this.showAlert("请输入用户名");
@@ -123,7 +124,12 @@
               return
             }else if(captcha.length!==4){
               this.showAlert("请输入4位验证码");
+              return
             }
+            //通过后提交密码登录的请求
+           result = await reqPwdLogin({name,pwd,captcha});
+            //登录后要更换验证码，调用更新验证码函数
+
         }else{//短信登录
              if(!this.isRightPhone){
                this.showAlert("请输入正确手机号");
@@ -132,7 +138,25 @@
                this.showAlert("请输入正确验证码");
                return
              }
+             //通过后提交短信登录的请求
+          result = await reqMsgLogin(phone,code)
         }
+        //根据结果做不同的处理
+        //不管登录成功失败，都要停止计时
+        if(this.computeTime>0){
+          this.computeTime=0
+        }
+        //登录成功
+        if(result.code===0){
+           const user=result.data;
+          //1 将user保存到state里
+          this.$store.dispatch("saveUser",user);
+          //2 自动跳转到个人中心
+          this.$router.replace("/profile")
+        }else{//登录失败
+           this.showAlert(result.msg)
+        }
+        this.updateCaptcha()
       }
     }
   }
