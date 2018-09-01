@@ -3,13 +3,13 @@
    <shopHeader/>
    <div class="tab">
      <div class="tab-item">
-      <router-link to="/shop/goods">点餐</router-link>
+      <router-link to="/shop/goods" replace>点餐</router-link>
      </div>
      <div class="tab-item">
-       <router-link to="/shop/rating">评价</router-link>
+       <router-link to="/shop/rating" replace>评价</router-link>
      </div>
      <div class="tab-item">
-       <router-link to="/shop/info">商家信息</router-link>
+       <router-link to="/shop/info" replace>商家信息</router-link>
      </div>
    </div>
    <router-view/>
@@ -19,9 +19,10 @@
 <script>
   import shopHeader from "../../components/shopHeader/shopHeader"
   export default {
-    data(){
-      return{}
+    mounted (){
+      this.$store.dispatch("getShopInfo")
     },
+
     components:{
       shopHeader
     }
